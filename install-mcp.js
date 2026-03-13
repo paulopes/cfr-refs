@@ -24,7 +24,7 @@ const os = require("os");
 
 const ROOT = __dirname;
 const MAIN_MJS = path.join(ROOT, "main.mjs");
-const SERVER_PATH = MAIN_MJS.replace(/\\/g, "/");
+const SERVER_PATH = MAIN_MJS;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

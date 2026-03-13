@@ -156,7 +156,7 @@ Options:
       try { existing = JSON.parse(fs.readFileSync(mcpPath, "utf-8")); } catch {}
     }
     if (!existing.mcpServers) existing.mcpServers = {};
-    const mainMjs = path.resolve(__dirname, "..", "main.mjs").replace(/\\/g, "/");
+    const mainMjs = path.resolve(__dirname, "..", "main.mjs");
     existing.mcpServers["cfr-refs"] = {
       command: "node",
       args: [mainMjs, "--stdio"],

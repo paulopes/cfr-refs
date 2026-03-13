@@ -53,7 +53,7 @@ function appData() {
 const CLIENTS = {
   "claude-code": {
     label: "Claude Code",
-    configPath: () => path.join(home(), ".claude", "settings.json"),
+    configPath: () => path.join(home(), ".claude", ".mcp.json"),
     serversKey: "mcpServers",
     scope: "global",
   },

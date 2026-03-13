@@ -67,11 +67,14 @@ Then in any Claude Code session, run `/cfr-refs` and describe the regulatory wor
 
 ## Claude.ai Project Skill
 
-You can also use cfr-refs as a skill in a [Claude.ai](https://claude.ai) chat project (the online version, not Claude Code). See [INSTALLING-ONLINE-PROJECT-SKILL.md](INSTALLING-ONLINE-PROJECT-SKILL.md) for setup and usage instructions in that chat environment.
+You can also use cfr-refs as a skill in a [Claude.ai](https://claude.ai) chat project (the online version, not Claude Code). See [INSTALLING-ONLINE-PROJECT-SKILL.md](INSTALLING-ONLINE-PROJECT-SKILL.md) for setup and usage instructions in a chat browser environment.
+
 
 ## MCP Tool
 
 cfr-refs is also available as an [MCP](https://modelcontextprotocol.io/) server, exposing a `generate-diagram` tool that any MCP-compatible client can call.
+
+You may be asking: Why would you want to use the MCP tool in Claude Code instead of the skill? The reason is that the MCP tools is also an MCP app, which means that the result will be rendered in line with the chat.
 
 ### Setup
 

@@ -4022,18 +4022,31 @@ function generateDiagram(cfg, cfgDir) {
 }
 
 /**
- * Lightweight HTML minifier — strips indentation whitespace and collapses
- * blank lines from the generated HTML.  Keeps the output functionally
- * identical while reducing byte count (typically 5-15%).
+ * Lightweight HTML minifier — strips whitespace from HTML structure and
+ * inline JavaScript.  Keeps the output functionally identical while
+ * reducing byte count (typically 20-30%).
  *
  * This matters for MCP clients like VS Code that impose a hard byte limit
  * on tool output that cannot be configured by the user.
  */
 function minifyHtml(html) {
+  // Minify inline <script> blocks (the bulk of the output)
+  html = html.replace(/<script>([\s\S]*?)<\/script>/g, (match, js) => {
+    js = js
+      .replace(/\/\/[^\n]*/g, "")       // strip single-line comments
+      .replace(/\n\s*/g, "")            // collapse newlines + indentation
+      .replace(/\s{2,}/g, " ")          // collapse runs of spaces
+      .replace(/\s*([=(){}\[\];,:<>+\-&|!?])\s*/g, "$1") // trim around operators
+      .replace(/;}/g, "}")              // remove unnecessary semicolons before }
+      .replace(/;;+/g, ";");            // collapse doubled semicolons
+    return "<script>" + js + "<\/script>";
+  });
+
+  // Minify HTML structure
   return html
-    .replace(/\n\s+/g, "\n")      // strip leading whitespace on each line
-    .replace(/\n{2,}/g, "\n")     // collapse consecutive blank lines
-    .replace(/>\s*\n\s*</g, "><") // remove whitespace between tags
+    .replace(/\n\s+/g, "\n")            // strip leading whitespace on each line
+    .replace(/\n{2,}/g, "\n")           // collapse consecutive blank lines
+    .replace(/>\s*\n\s*</g, "><")       // remove whitespace between tags
     .trim();
 }
 

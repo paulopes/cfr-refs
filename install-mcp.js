@@ -53,9 +53,9 @@ function appData() {
 const CLIENTS = {
   "claude-code": {
     label: "Claude Code",
-    configPath: () => path.join(ROOT, ".mcp.json"),
+    configPath: () => path.join(home(), ".claude", "settings.json"),
     serversKey: "mcpServers",
-    scope: "project",
+    scope: "global",
   },
   "claude-desktop": {
     label: "Claude Desktop",

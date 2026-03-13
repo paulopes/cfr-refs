@@ -50,7 +50,7 @@ Add the server entry to your client's MCP configuration file:
 
 | Client | Config file | Servers key |
 |--------|------------|-------------|
-| Claude Code | `.mcp.json` (project root) | `mcpServers` |
+| Claude Code | `~/.claude/settings.json` (global) | `mcpServers` |
 | Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows) | `mcpServers` |
 | VS Code (Copilot) | `.vscode/mcp.json` (project root) | `servers` |
 | Cursor | `~/.cursor/mcp.json` | `mcpServers` |

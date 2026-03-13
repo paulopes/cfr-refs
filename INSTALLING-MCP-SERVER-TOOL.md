@@ -111,15 +111,18 @@ The key information is always the same — `node` as the command, and the absolu
 
 ### 3. Enable the server (Claude Code only)
 
-Claude Code requires the server to be listed in `enabledMcpjsonServers` in `~/.claude/settings.json`:
+Claude Code requires the server to be listed in `enabledMcpjsonServers` in `~/.claude/settings.json`. The generated diagrams can also exceed the default 25 000-token MCP output limit, so you should raise `MAX_MCP_OUTPUT_TOKENS`:
 
 ```json
 {
-  "enabledMcpjsonServers": ["cfr-refs"]
+  "enabledMcpjsonServers": ["cfr-refs"],
+  "env": {
+    "MAX_MCP_OUTPUT_TOKENS": "50000"
+  }
 }
 ```
 
-If `enabledMcpjsonServers` already exists, add `"cfr-refs"` to the array. The automated installer (`npm run install-mcp`) does this automatically.
+If `enabledMcpjsonServers` already exists, add `"cfr-refs"` to the array. The automated installer (`npm run install-mcp`) does both of these automatically.
 
 ### 4. Restart the client
 

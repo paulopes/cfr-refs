@@ -191,27 +191,46 @@ function registerServer(profile) {
 
 function enableInClaudeSettings() {
   const settingsPath = path.join(home(), ".claude", "settings.json");
+  const MIN_MCP_TOKENS = 50000;
 
   let settings = {};
   if (fs.existsSync(settingsPath)) {
     try {
       settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
     } catch {
-      warn("settings.json exists but is invalid JSON — skipping enabledMcpjsonServers");
+      warn("settings.json exists but is invalid JSON — skipping Claude Code settings");
       return;
     }
   }
 
+  let dirty = false;
+
+  // enabledMcpjsonServers
   const arr = settings.enabledMcpjsonServers || [];
   if (arr.includes("cfr-refs")) {
     ok("enabledMcpjsonServers already includes cfr-refs");
-    return;
+  } else {
+    arr.push("cfr-refs");
+    settings.enabledMcpjsonServers = arr;
+    dirty = true;
+    ok("enabledMcpjsonServers updated");
   }
 
-  arr.push("cfr-refs");
-  settings.enabledMcpjsonServers = arr;
-  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf-8");
-  ok(`enabledMcpjsonServers updated → ${settingsPath}`);
+  // env.MAX_MCP_OUTPUT_TOKENS — diagrams can exceed the 25 000 default
+  if (!settings.env) settings.env = {};
+  const current = parseInt(settings.env.MAX_MCP_OUTPUT_TOKENS, 10) || 0;
+  if (current >= MIN_MCP_TOKENS) {
+    ok(`MAX_MCP_OUTPUT_TOKENS already ${current}`);
+  } else {
+    settings.env.MAX_MCP_OUTPUT_TOKENS = String(MIN_MCP_TOKENS);
+    dirty = true;
+    ok(`MAX_MCP_OUTPUT_TOKENS set to ${MIN_MCP_TOKENS}`);
+  }
+
+  if (dirty) {
+    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf-8");
+    ok(`Settings written → ${settingsPath}`);
+  }
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────

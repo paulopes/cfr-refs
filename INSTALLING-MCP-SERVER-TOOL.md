@@ -109,7 +109,23 @@ extensions:
 
 The key information is always the same — `node` as the command, and the absolute path to `main.mjs` with `--stdio` as arguments. Consult your client's documentation for the exact config file location and format.
 
-### 3. Verify
+### 3. Enable the server (Claude Code only)
+
+Claude Code requires the server to be listed in `enabledMcpjsonServers` in `~/.claude/settings.json`:
+
+```json
+{
+  "enabledMcpjsonServers": ["cfr-refs"]
+}
+```
+
+If `enabledMcpjsonServers` already exists, add `"cfr-refs"` to the array. The automated installer (`npm run install-mcp`) does this automatically.
+
+### 4. Restart the client
+
+After registering the server, **fully quit** your client and relaunch it. For Claude Code, closing the window is not enough — you must quit the application entirely (e.g. `Ctrl+Q` or right-click the system tray icon → Quit).
+
+### 5. Verify
 
 In a Claude Code session, ask:
 

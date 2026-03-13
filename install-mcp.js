@@ -187,6 +187,33 @@ function registerServer(profile) {
   ok(`MCP config written → ${cfgPath}`);
 }
 
+// ── Enable server in Claude Code settings ────────────────────────────────────
+
+function enableInClaudeSettings() {
+  const settingsPath = path.join(home(), ".claude", "settings.json");
+
+  let settings = {};
+  if (fs.existsSync(settingsPath)) {
+    try {
+      settings = JSON.parse(fs.readFileSync(settingsPath, "utf-8"));
+    } catch {
+      warn("settings.json exists but is invalid JSON — skipping enabledMcpjsonServers");
+      return;
+    }
+  }
+
+  const arr = settings.enabledMcpjsonServers || [];
+  if (arr.includes("cfr-refs")) {
+    ok("enabledMcpjsonServers already includes cfr-refs");
+    return;
+  }
+
+  arr.push("cfr-refs");
+  settings.enabledMcpjsonServers = arr;
+  fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2) + "\n", "utf-8");
+  ok(`enabledMcpjsonServers updated → ${settingsPath}`);
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 const clientName = parseArgs();
@@ -198,10 +225,17 @@ try {
   checkPrerequisites();
   registerServer(profile);
 
+  if (clientName === "claude-code") {
+    enableInClaudeSettings();
+  }
+
   console.log(`\n\x1b[32mDone!\x1b[0m cfr-refs is ready to use with ${profile.label}.\n`);
   console.log("  Stdio mode:  node " + SERVER_PATH + " --stdio");
   console.log("  HTTP mode:   node " + SERVER_PATH + "  (port 3001)");
   console.log("\n  The 'generate-diagram' tool is now available.");
+  if (clientName === "claude-code") {
+    console.log("  \x1b[33mIMPORTANT:\x1b[0m Fully quit Claude Code (don't just close the window) and relaunch it.");
+  }
   console.log("  Ask your AI assistant: \"What tools do you have?\" to verify.\n");
 } catch (e) {
   fail(e.message);

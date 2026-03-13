@@ -30,7 +30,7 @@ npm run install-mcp:windsurf
 
 Run `npm run install-mcp -- --list` to see all supported clients and their config file locations.
 
-The installer verifies that `npm install` and `npm run build` have already been run, registers the MCP server in the target client's config, and (for Claude Code) installs the skill.
+The installer verifies that `npm install` and `npm run build` have already been run, and registers the MCP server in the target client's config.
 
 ## Manual Setup
 
@@ -50,7 +50,7 @@ Add the server entry to your client's MCP configuration file:
 
 | Client | Config file | Servers key |
 |--------|------------|-------------|
-| Claude Code | `~/.claude/settings.json` (global) | `mcpServers` |
+| Claude Code | `~/.claude/.mcp.json` (global) | `mcpServers` |
 | Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows) | `mcpServers` |
 | VS Code (Copilot) | `.vscode/mcp.json` (project root) | `servers` |
 | Cursor | `~/.cursor/mcp.json` | `mcpServers` |

@@ -8,7 +8,13 @@
   "scripts": {
     "build": "cross-env INPUT=mcp-app.html vite build",
     "start": "concurrently --raw \"cross-env NODE_ENV=development INPUT=mcp-app.html vite build --watch\" \"node --watch main.mjs\"",
-    "start:stdio": "node main.mjs --stdio"
+    "start:stdio": "node main.mjs --stdio",
+    "install-mcp": "node install-mcp.js",
+    "install-mcp:claude-code": "node install-mcp.js --client=claude-code",
+    "install-mcp:claude-desktop": "node install-mcp.js --client=claude-desktop",
+    "install-mcp:vscode": "node install-mcp.js --client=vscode",
+    "install-mcp:cursor": "node install-mcp.js --client=cursor",
+    "install-mcp:windsurf": "node install-mcp.js --client=windsurf"
   },
   "keywords": [
     "mermaid",

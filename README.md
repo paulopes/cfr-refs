@@ -67,7 +67,7 @@ Then in any Claude Code session, run `/cfr-refs` and describe the regulatory wor
 
 ## Claude.ai Project Skill
 
-You can also use cfr-refs as a skill in a [Claude.ai](https://claude.ai) chat project (the online version, not Claude Code). See [INSTALL-ONLINE-PROJECT-SKILL.md](INSTALL-ONLINE-PROJECT-SKILL.md) for setup and usage instructions in that chat environment.
+You can also use cfr-refs as a skill in a [Claude.ai](https://claude.ai) chat project (the online version, not Claude Code). See [INSTALLING-ONLINE-PROJECT-SKILL.md](INSTALLING-ONLINE-PROJECT-SKILL.md) for setup and usage instructions in that chat environment.
 
 ## MCP Tool
 
@@ -83,31 +83,36 @@ npm run build
 
 ### Running
 
-**HTTP transport** (for Claude Desktop, web clients, etc.):
+**HTTP transport** (standalone server):
 ```bash
 node main.mjs
 ```
-The server listens on `http://localhost:3001/mcp` by default. Set the `PORT` environment variable to change the port.
+The server listens on `http://localhost:3001/mcp` using Streamable HTTP. Set the `PORT` environment variable to change the port.
 
-**stdio transport** (for VS Code, Claude Code, etc.):
+**stdio transport** (for native MCP clients):
 ```bash
 node main.mjs --stdio
 ```
 
-### MCP Client Configuration
+### Connecting from web apps on the same machine
 
-Add to your MCP client settings (e.g. Claude Desktop `claude_desktop_config.json` or VS Code `settings.json`):
+When the server is running in HTTP mode, any web application on the same machine can connect to it at `http://localhost:3001/mcp` using the Streamable HTTP transport. CORS is enabled, so browser-based apps can call the `generate-diagram` tool directly.
 
-```json
-{
-  "mcpServers": {
-    "cfr-refs": {
-      "command": "node",
-      "args": ["<path-to-cfr-refs>/main.mjs", "--stdio"]
-    }
-  }
-}
+> **Note:** Cloud-hosted AI clients (e.g. Claude.ai, ChatGPT) make MCP connections from their own servers, not from your browser — so `localhost` won't work for those. You would need to expose the server via a tunnel (e.g. ngrok) or deploy it to a public host. In that case, consider adding authentication before exposing the server to the internet.
+
+### Installing in native MCP clients
+
+For native desktop clients like Claude Code, Claude Desktop, VS Code, Cursor, Windsurf, and others, the server runs over stdio and is registered in each client's configuration file. An automated installer is provided:
+
+```bash
+npm run install-mcp                  # Claude Code (default)
+npm run install-mcp:vscode
+npm run install-mcp:claude-desktop
+npm run install-mcp:cursor
+npm run install-mcp:windsurf
 ```
+
+See [INSTALLING-MCP-SERVER-TOOL.md](INSTALLING-MCP-SERVER-TOOL.md) for full details, manual setup steps, config file locations, and instructions for other clients (including Goose).
 
 The `generate-diagram` tool accepts a `config` parameter (the same JSON schema described in [cfr-refs-SKILL.md](skill/cfr-refs-SKILL.md)) and returns a self-contained HTML diagram.
 

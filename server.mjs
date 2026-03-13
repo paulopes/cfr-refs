@@ -13,6 +13,7 @@ const __dirname = import.meta.dirname;
 
 // Locate the dist dir — works from both source (server.mjs) and build output
 const DIST_DIR = path.join(__dirname, "dist");
+const SKILL_PATH = path.join(__dirname, "skill", "cfr-refs-SKILL.md");
 
 // Import the cfr-refs generator (CJS module)
 import { createRequire } from "node:module";
@@ -29,6 +30,7 @@ export function createServer() {
   });
 
   const resourceUri = "ui://cfr-refs/mcp-app.html";
+  const skillGuideUri = "docs://cfr-refs/skill-guide";
 
   // ── Tool: generate-diagram ──────────────────────────────────────────────
   //
@@ -42,15 +44,30 @@ export function createServer() {
     {
       title: "Generate CFR Diagram",
       description:
-        "Generate an interactive HTML regulatory diagram from a cfr-refs " +
-        "JSON config. Returns a self-contained HTML document with clickable " +
-        "CFR reference tooltips. Supports layouts: events, timeline, " +
-        "lifecycle, lifecycle-t, flowchart, sequence, state, gantt.",
+        "Generate an interactive HTML regulatory diagram from a cfr-refs JSON config. " +
+        "Returns a self-contained HTML document with clickable CFR reference tooltips.\n\n" +
+        "IMPORTANT: Before calling this tool, read the skill guide resource at " +
+        "docs://cfr-refs/skill-guide for full JSON schema details, layout selection " +
+        "guidance, quality checklists, and examples.\n\n" +
+        "Layouts (set via \"layout\" field):\n" +
+        "- events: Vertical spine with era sections and clickable event dots (needs \"sections\")\n" +
+        "- timeline: Gantt-style bars on a shared year axis (needs \"periods\")\n" +
+        "- lifecycle: SVG swim-lane grid — lanes as rows, stages as columns (needs \"lanes\", \"stages\")\n" +
+        "- lifecycle-t: Transposed swim-lane grid — lanes as columns, stages as rows (needs \"lanes\", \"stages\")\n" +
+        "- flowchart: Mermaid flowchart TD with clickable nodes (needs \"nodeMap\" + \"mermaid\")\n" +
+        "- sequence: Mermaid sequenceDiagram with phase cards (needs \"phases\" + \"mermaid\")\n" +
+        "- state: Mermaid stateDiagram-v2 with clickable states (needs \"stateMap\" + \"mermaid\")\n" +
+        "- gantt: Mermaid gantt chart with clickable tasks (needs \"taskMap\" + \"mermaid\")\n\n" +
+        "Required fields (all layouts): title, borderColor, layout, defined.\n" +
+        "The \"defined\" object maps CFR section keys to [shortTitle, quotedText] arrays.",
       inputSchema: z.object({
         config: z
           .record(z.any())
           .describe(
-            "The cfr-refs JSON config object (title, borderColor, layout, defined, etc.)"
+            "The cfr-refs JSON config object. Required fields: title (string), " +
+            "borderColor (hex string), layout (string), defined (object mapping CFR " +
+            "section keys to [shortTitle, quotedText] arrays). Additional fields " +
+            "depend on layout — see the skill guide resource for full schema."
           ),
         configDir: z
           .string()
@@ -73,6 +90,32 @@ export function createServer() {
           isError: true,
         };
       }
+    }
+  );
+
+  // ── Resource: skill guide ────────────────────────────────────────────────
+  //
+  // Exposes the cfr-refs SKILL.md as a readable MCP resource so that AI
+  // clients can fetch full layout schemas, examples, and quality checklists
+  // before calling generate-diagram.
+
+  server.resource(
+    "skill-guide",
+    skillGuideUri,
+    {
+      title: "cfr-refs Skill Guide",
+      description:
+        "Complete documentation for the cfr-refs diagram generator: " +
+        "JSON schemas for all 8 layouts, field references, canonical " +
+        "program colors, quality checklists, and worked examples. " +
+        "Read this before calling generate-diagram.",
+      mimeType: "text/markdown",
+    },
+    async (uri) => {
+      const text = await fs.readFile(SKILL_PATH, "utf-8");
+      return {
+        contents: [{ uri: uri.toString(), mimeType: "text/markdown", text }],
+      };
     }
   );
 

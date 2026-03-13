@@ -615,7 +615,6 @@ function _acroPos(e){
 var _lastAcroEl=null;
 document.addEventListener('mousemove',function(e){
   var el=e.target;
-  /* Peek through transparent overlay rects (lc-click etc.) */
   var hidden=null;
   if(el.tagName==='rect'||el.tagName==='RECT'){
     var pe=el.style.pointerEvents||el.getAttribute('pointer-events')||'';
@@ -628,7 +627,6 @@ document.addEventListener('mousemove',function(e){
     }
     if(hidden)hidden.style.pointerEvents='';
   }
-  /* Check if el or any ancestor is an acro span/tspan */
   var found=null,cur=el;
   for(var i=0;i<6&&cur&&cur!==document.body;i++){
     if(cur.classList&&cur.classList.contains('acro')){found=cur;break;}
@@ -880,12 +878,10 @@ h1{text-align:center;font-size:1.4rem;margin-bottom:4px;color:#0f172a}
 .instr-wrap{text-align:center;margin-bottom:20px}
 .instr{font-size:.8rem;color:#0369a1;background:#e0f2fe;padding:8px 16px;border-radius:8px;display:inline-block}
 
-/* Outer card */
 .hchart{background:#fff;border-radius:12px;padding:20px 24px 24px;
   box-shadow:0 1px 6px rgba(0,0,0,.07);border-left:5px solid ${borderColor};
   overflow-x:auto;min-width:0}
 
-/* Axis row */
 .axis-row{display:flex;align-items:flex-end;margin-bottom:0}
 .axis-spacer{flex:0 0 200px;padding-right:16px}
 .axis-wrap{flex:1;position:relative;height:30px;border-bottom:2px solid #e2e8f0}
@@ -893,10 +889,8 @@ h1{text-align:center;font-size:1.4rem;margin-bottom:4px;color:#0f172a}
 .tick-line{width:1px;height:6px;background:#cbd5e1;margin:0 auto}
 .tick-label{font-size:.7rem;color:#94a3b8;margin-top:2px;white-space:nowrap;text-align:center}
 
-/* Chart body — wraps marker lines + all rows */
 .chart-body{display:flex;flex-direction:column;gap:0;position:relative}
 
-/* Marker header row (callout boxes above chart rows) */
 .markers-header{display:flex;align-items:flex-end;margin-bottom:4px}
 .markers-wrap{flex:1;position:relative;height:38px}
 .mcallout{position:absolute;transform:translateX(-50%);background:#f8fafc;
@@ -909,11 +903,9 @@ h1{text-align:center;font-size:1.4rem;margin-bottom:4px;color:#0f172a}
 .mc-clickable:hover{background:#eff6ff;border-color:#bfdbfe}
 .mc-clickable:hover .mcallout-label{color:#1d4ed8}
 
-/* Vertical marker lines (inside chart-body) */
 .mline{position:absolute;top:0;bottom:0;width:1px;border-left:1px dashed #cbd5e1;
   pointer-events:none;z-index:1}
 
-/* Program rows */
 .prog-row{display:flex;align-items:center;margin-bottom:18px;position:relative;z-index:2}
 .prog-row:last-child{margin-bottom:0}
 .prog-name{flex:0 0 200px;font-size:.82rem;font-weight:600;color:#334155;
@@ -924,7 +916,6 @@ h1{text-align:center;font-size:1.4rem;margin-bottom:4px;color:#0f172a}
 .prog-name-refs{font-size:.7rem;font-weight:400;color:#94a3b8;margin-top:3px;opacity:.72;line-height:1.3}
 .prog-chart{flex:1;position:relative;height:60px}
 
-/* Bar */
 .prog-bar{position:absolute;top:4px;height:32px;border-radius:6px;
   display:flex;align-items:center;padding:0 10px;
   cursor:pointer;transition:filter .15s,box-shadow .15s;
@@ -932,7 +923,6 @@ h1{text-align:center;font-size:1.4rem;margin-bottom:4px;color:#0f172a}
 .prog-bar:hover{filter:brightness(1.1);box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .prog-bar.ongoing{border-right:3px dashed rgba(255,255,255,.55);border-radius:6px 3px 3px 6px}
 
-/* Diagonal stripe overlay for pilot programs */
 .prog-bar.pilot::after{content:'';position:absolute;inset:0;
   background:repeating-linear-gradient(
     45deg,
@@ -942,14 +932,12 @@ h1{text-align:center;font-size:1.4rem;margin-bottom:4px;color:#0f172a}
     rgba(255,255,255,0.15) 8px
   );pointer-events:none;border-radius:inherit}
 
-/* Bar text */
 .prog-bar{flex-direction:column;justify-content:center}
 .bar-range{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.95);
   white-space:nowrap;line-height:1.2;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:1}
 .bar-refs{font-size:.67rem;color:rgba(255,255,255,.62);white-space:nowrap;
   margin-top:1px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:1}
 
-/* Sub-milestone dots */
 .ms-dot{position:absolute;top:36px;transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;pointer-events:none}
 .ms-dot.ms-clickable{pointer-events:auto;cursor:pointer}
@@ -1155,8 +1143,6 @@ function lcLabelPlacementScript() {
   return `
 (function(){
 'use strict';
-
-/* ── path sampling ─────────────────────────────────────────────────── */
 function samplePath(el, n) {
   var len = el.getTotalLength();
   if (!len) return [];
@@ -1167,18 +1153,14 @@ function samplePath(el, n) {
   }
   return pts;
 }
-
-/* ── candidate generation ───────────────────────────────────────────── */
 function candidates(pathEl, labelNear, tw, th) {
   var len = pathEl.getTotalLength();
   if (len < 4) return [];
-  var GAP        = th / 2 + 25;   // px from endpoint to nearest label edge
-  var NUDGE      = th / 2 + 5;    // perpendicular distance from path centre
-  var SHORT_LINE = 120;            // threshold below which horizontal lines get extra gap
-  var NUDGE_H    = len < SHORT_LINE ? NUDGE + 5 : NUDGE;  // extra 5px on short horiz segments
+  var GAP        = th / 2 + 25;
+  var NUDGE      = th / 2 + 5;
+  var SHORT_LINE = 120;
+  var NUDGE_H    = len < SHORT_LINE ? NUDGE + 5 : NUDGE;
   var cands = [];
-
-  /* find arc-length positions that are >= GAP from each endpoint */
   var lStart = 0, lEnd = len;
   var N = 128;
   var startPt = pathEl.getPointAtLength(0);
@@ -1196,8 +1178,6 @@ function candidates(pathEl, labelNear, tw, th) {
     if (Math.sqrt(dx*dx+dy*dy) >= GAP) { lEnd = d; break; }
   }
   if (lStart > lEnd) { var tmp = lStart; lStart = lEnd; lEnd = tmp; }
-
-  /* pick sample arc-length positions based on labelNear */
   var mid = (lStart + lEnd) / 2;
   var samples;
   if (labelNear === 'start') {
@@ -1205,26 +1185,15 @@ function candidates(pathEl, labelNear, tw, th) {
   } else if (labelNear === 'end') {
     samples = [lEnd, (lEnd + mid) / 2];
   } else if (len > 250) {
-    /* Dense uniform sweep for long arrows that may pass through intermediate
-     * boxes — gives the scorer enough resolution to find clear gap segments. */
     var N_SAMP = 24;
     samples = [];
     for (var si2 = 0; si2 <= N_SAMP; si2++) {
       samples.push(lStart + si2 * (lEnd - lStart) / N_SAMP);
     }
   } else {
-    /* Short / adjacent-box connections: original 5-point set works well. */
     samples = [mid, (mid + lStart) / 2, (mid + lEnd) / 2,
                (lStart * 3 + lEnd) / 4, (lStart + lEnd * 3) / 4];
   }
-
-  /* for each sample, emit candidates based on path orientation at that point.
-   * Strategy:
-   *   - Primarily VERTICAL tangent → one candidate centred ON the line (cx=pt.x),
-   *     plus two side fallbacks; avoids left/right bias between up/down arrows.
-   *   - Primarily HORIZONTAL tangent → above and below candidates.
-   *   - Diagonal/curved tangent → canonical perpendicular both directions.
-   */
   var STEP = Math.min(4, len / 20);
   for (var si = 0; si < samples.length; si++) {
     var sl = samples[si];
@@ -1235,18 +1204,13 @@ function candidates(pathEl, labelNear, tw, th) {
     var pt = pathEl.getPointAtLength(sl);
     var ax = Math.abs(tx), ay = Math.abs(ty);
     if (ay >= ax * 2) {
-      /* primarily vertical: centre on line; sides are fallbacks only */
       cands.push({cx: pt.x,         cy: pt.y});
       cands.push({cx: pt.x + NUDGE, cy: pt.y});
       cands.push({cx: pt.x - NUDGE, cy: pt.y});
     } else if (ax >= ay * 2) {
-      /* primarily horizontal: above first (preferred), then below.
-       * Use NUDGE_H (larger on short lines) to keep the label clear of arrowheads. */
       cands.push({cx: pt.x, cy: pt.y - NUDGE_H});
       cands.push({cx: pt.x, cy: pt.y + NUDGE_H});
     } else {
-      /* diagonal / curved: canonical perpendicular both directions */
-      /* normalize tangent so first candidate is always on the same geometric side */
       if (ay >= ax) { if (ty > 0) { tx = -tx; ty = -ty; } }
       else          { if (tx < 0) { tx = -tx; ty = -ty; } }
       var nx = -ty / tl, ny = tx / tl;
@@ -1256,15 +1220,12 @@ function candidates(pathEl, labelNear, tw, th) {
   }
   return cands;
 }
-
-/* ── scoring ────────────────────────────────────────────────────────── */
 function overlap(ax,ay,aw,ah, bx,by,bw,bh) {
   return ax < bx+bw && ax+aw > bx && ay < by+bh && ay+ah > by;
 }
 
 function score(rx,ry,rw,rh, ownPath, pathSamples, cards, placed) {
   var n = 0;
-  /* path samples: +1 per path whose sample points enter the pill */
   for (var pi = 0; pi < pathSamples.length; pi++) {
     var entry = pathSamples[pi];
     if (entry[0] === ownPath) continue;
@@ -1275,49 +1236,41 @@ function score(rx,ry,rw,rh, ownPath, pathSamples, cards, placed) {
           pts[i].y >= ey && pts[i].y <= ey+eh) { n += 1; break; }
     }
   }
-  /* card rects: +10 per overlap (high penalty so any gap position wins) */
   for (var ci = 0; ci < cards.length; ci++) {
     var c = cards[ci];
     if (overlap(rx,ry,rw,rh, c.x,c.y,c.w,c.h)) n += 10;
   }
-  /* already-placed pills: +4 per overlap, plus soft proximity penalty */
   for (var li = 0; li < placed.length; li++) {
     var l = placed[li];
     if (overlap(rx,ry,rw,rh, l.x,l.y,l.w,l.h)) {
       n += 4;
     } else {
-      /* soft repulsion: add up to +2 that fades with distance from centre-to-centre */
       var dcx = (rx + rw/2) - (l.x + l.w/2);
       var dcy = (ry + rh/2) - (l.y + l.h/2);
       var dist = Math.sqrt(dcx*dcx + dcy*dcy);
-      var REPEL = 80; /* px — full repulsion within this radius */
+      var REPEL = 80;
       if (dist < REPEL) n += 2 * (1 - dist / REPEL);
     }
   }
   return n;
 }
-
-/* ── main ───────────────────────────────────────────────────────────── */
 function placeLabels() {
   var svgEl = document.querySelector('svg');
   if (!svgEl) return;
   var PAD_X = 5, PAD_Y = 3;
   var ns = 'http://www.w3.org/2000/svg';
 
-  /* card obstacles */
   var cards = [];
   svgEl.querySelectorAll('rect[id^="cell-"]').forEach(function(el) {
     var b = el.getBBox();
     cards.push({x:b.x, y:b.y, w:b.width, h:b.height});
   });
 
-  /* path samples (32 pts per path) */
   var pathSamples = [];
   svgEl.querySelectorAll('path[id^="conn-path-"]').forEach(function(el) {
     pathSamples.push([el, samplePath(el, 32)]);
   });
 
-  /* sort label elements by conn index */
   var labelEls = Array.from(svgEl.querySelectorAll('text[id^="conn-label-"]'));
   labelEls.sort(function(a,b) {
     return parseInt(a.id.replace('conn-label-','')) -
@@ -1333,7 +1286,6 @@ function placeLabels() {
 
     var labelNear = pathEl.dataset.labelNear || null;
 
-    /* measure actual text — temporarily un-hide */
     labelEl.setAttribute('style','opacity:0');
     var tb = labelEl.getBBox();
     var tw = tb.width, th = tb.height;
@@ -1341,13 +1293,9 @@ function placeLabels() {
 
     var rw = tw + 2*PAD_X, rh = th + 2*PAD_Y;
 
-    /* generate & score candidates */
     var cands = candidates(pathEl, labelNear, tw, th);
     if (!cands.length) { labelEl.setAttribute('style',''); return; }
 
-    /* exclude cards containing either path endpoint from obstacle scoring —
-     * those are the two cells this connection actually joins, so the label
-     * is allowed to touch them (it sits right between them). */
     var pLen = pathEl.getTotalLength();
     var ep0 = pathEl.getPointAtLength(0);
     var ep1 = pathEl.getPointAtLength(pLen);
@@ -1367,7 +1315,6 @@ function placeLabels() {
       if (s < bestScore) { bestScore = s; best = {cx:c.cx,cy:c.cy,rx:rx,ry:ry}; }
     }
 
-    /* insert background rect */
     var rect = document.createElementNS(ns, 'rect');
     rect.setAttribute('x',  best.rx.toFixed(1));
     rect.setAttribute('y',  best.ry.toFixed(1));
@@ -1378,7 +1325,6 @@ function placeLabels() {
     rect.setAttribute('fill-opacity', '0.92');
     labelEl.parentNode.insertBefore(rect, labelEl);
 
-    /* reposition text: shift by delta from current bbox centre to best centre */
     var xa = parseFloat(labelEl.getAttribute('x')) || 0;
     var ya = parseFloat(labelEl.getAttribute('y')) || 0;
     var newX = (xa + best.cx - (tb.x + tw/2)).toFixed(1);
@@ -1386,17 +1332,14 @@ function placeLabels() {
     labelEl.setAttribute('x', newX);
     labelEl.setAttribute('y', newY);
     labelEl.setAttribute('text-anchor', 'middle');
-    /* propagate new x to tspan children (wrapped multi-line labels) */
     labelEl.querySelectorAll('tspan').forEach(function(ts) {
       ts.setAttribute('x', newX);
     });
     labelEl.setAttribute('style', '');
     labelEl.removeAttribute('opacity');
 
-    /* track placed rect */
     placed.push({x:best.rx, y:best.ry, w:rw, h:rh});
 
-    /* click overlay for ref tooltip (if label has a data-idx) */
     var idx = labelEl.dataset.connLabelIdx;
     if (idx !== undefined && idx !== '') {
       var ov = document.createElementNS(ns, 'rect');
@@ -2236,7 +2179,7 @@ function buildLifecycle() {
     if (edge === "right") return { x: rect.x + rect.w, y: rect.cy + offset * rect.h };
     if (edge === "left")  return { x: rect.x,           y: rect.cy + offset * rect.h };
     if (edge === "top")   return { x: rect.cx + offset * rect.w, y: rect.y            };
-    /* bottom */          return { x: rect.cx + offset * rect.w, y: rect.y + rect.h   };
+    return { x: rect.cx + offset * rect.w, y: rect.y + rect.h   };
   }
 
   // ── Pass 1: compute all pts arrays so labels can check against other paths ──
@@ -3155,7 +3098,7 @@ function buildLifecycleT() {
     if (edge === "bottom") return { x: rect.cx + offset * rect.w, y: rect.y + rect.h };
     if (edge === "top")    return { x: rect.cx + offset * rect.w, y: rect.y            };
     if (edge === "right")  return { x: rect.x + rect.w,           y: rect.cy + offset * rect.h };
-    /* left */             return { x: rect.x,                    y: rect.cy + offset * rect.h };
+    return { x: rect.x,                    y: rect.cy + offset * rect.h };
   }
 
   // ── Pass 1: compute all pts ───────────────────────────────────────────────
@@ -3721,7 +3664,6 @@ mermaid.initialize({
   var bbox=svg.getBBox();var pad=8;
   svg.setAttribute('viewBox',(bbox.x-pad)+' '+(bbox.y-pad)+' '+(bbox.width+pad*2)+' '+(bbox.height+pad*2));
   svg.style.maxWidth='100%';svg.style.height='auto';
-  /* Make phase note bars and § refs in arrows clickable */
   var secRe=/\\u00a7 ?([0-9]+\\.[0-9]+(?:\\([a-z]\\)(?:\\([0-9]+\\))?)?)/g;
   function findSecRefs(str){
     secRe.lastIndex=0;var refs=[],m;
@@ -4033,12 +3975,11 @@ function minifyHtml(html) {
   // Minify inline <script> blocks (the bulk of the output)
   html = html.replace(/<script>([\s\S]*?)<\/script>/g, (match, js) => {
     js = js
-      .replace(/\/\/[^\n]*/g, "")       // strip single-line comments
-      .replace(/\n\s*/g, "")            // collapse newlines + indentation
-      .replace(/\s{2,}/g, " ")          // collapse runs of spaces
+      .replace(/\n\s*/g, "")             // collapse newlines + indentation
+      .replace(/\s{2,}/g, " ")           // collapse runs of spaces
       .replace(/\s*([=(){}\[\];,:<>+\-&|!?])\s*/g, "$1") // trim around operators
-      .replace(/;}/g, "}")              // remove unnecessary semicolons before }
-      .replace(/;;+/g, ";");            // collapse doubled semicolons
+      .replace(/;}/g, "}")               // remove unnecessary semicolons before }
+      .replace(/;;+/g, ";");             // collapse doubled semicolons
     return "<script>" + js + "<\/script>";
   });
 

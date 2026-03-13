@@ -60,118 +60,125 @@
 const fs   = require("fs");
 const path = require("path");
 
+// ── Module-level state (set by _initFromConfig or CLI) ──────────────────────
+
+let config, configPath, configDir, mermaidContent, mermaidMode, layout, outputPath;
+
+// ── Config initialisation (shared by CLI and library entry points) ───────────
+
+function _validateConfig(cfg) {
+  if (!cfg.title)       throw new Error('config missing "title".');
+  if (!cfg.borderColor) throw new Error('config missing "borderColor".');
+  if (!cfg.defined)     throw new Error('config missing "defined".');
+}
+
+function _initFromConfig(cfg, cfgDir) {
+  config    = cfg;
+  configDir = cfgDir;
+
+  _validateConfig(config);
+
+  // ── Load Mermaid content (for Mermaid-based layouts) ──────────────────────
+  mermaidContent = "";
+  if (config.mermaid) {
+    mermaidContent = config.mermaid.trim();
+  } else if (config.mermaidFile) {
+    const mmdPath = path.resolve(configDir, config.mermaidFile);
+    mermaidContent = fs.readFileSync(mmdPath, "utf-8").trim();
+  }
+
+  // Auto-detect Mermaid mode from first line of content
+  mermaidMode = null;
+  if (mermaidContent) {
+    const fl = mermaidContent.split("\n")[0].trim().toLowerCase();
+    if (fl.startsWith("sequencediagram"))  mermaidMode = "sequence";
+    else if (fl.startsWith("statediagram")) mermaidMode = "state";
+    else if (fl.startsWith("gantt"))        mermaidMode = "gantt";
+    else                                    mermaidMode = "flowchart";
+  }
+
+  layout = (config.layout || "events").toLowerCase();
+
+  // ── Layout-specific validation ────────────────────────────────────────────
+  if (layout === "events") {
+    if (!Array.isArray(config.sections) || !config.sections.length)
+      throw new Error('vertical layout requires a non-empty "sections" array.');
+  } else if (layout === "timeline") {
+    if (!Array.isArray(config.periods) || !config.periods.length)
+      throw new Error('timeline layout requires a non-empty "periods" array.');
+  } else if (layout === "lifecycle") {
+    if (!Array.isArray(config.lanes) || !config.lanes.length)
+      throw new Error('lifecycle layout requires a non-empty "lanes" array.');
+    if (!Array.isArray(config.stages) || !config.stages.length)
+      throw new Error('lifecycle layout requires a non-empty "stages" array.');
+  } else if (layout === "lifecycle-t") {
+    if (!Array.isArray(config.lanes) || !config.lanes.length)
+      throw new Error('lifecycle-t layout requires a non-empty "lanes" array.');
+    if (!Array.isArray(config.stages) || !config.stages.length)
+      throw new Error('lifecycle-t layout requires a non-empty "stages" array.');
+  } else if (layout === "flowchart" || layout === "sequence" || layout === "state" || layout === "gantt") {
+    if (!mermaidContent)
+      throw new Error(`layout "${layout}" requires "mermaid" or "mermaidFile" in config.`);
+    if (layout === "flowchart" && !config.nodeMap)
+      throw new Error('flowchart layout requires "nodeMap" in config.');
+    if (layout === "sequence" && !config.phases)
+      throw new Error('sequence layout requires "phases" in config.');
+    if (layout === "state" && !config.stateMap)
+      throw new Error('state layout requires "stateMap" in config.');
+    if (layout === "gantt" && !config.taskMap)
+      throw new Error('gantt layout requires "taskMap" in config.');
+  } else {
+    throw new Error(`unknown layout "${layout}". Use "events", "timeline", "lifecycle", "lifecycle-t", "flowchart", "sequence", "state", or "gantt".`);
+  }
+}
+
 // ── CLI ──────────────────────────────────────────────────────────────────────
 
-function usage() {
-  console.log(`
+if (require.main === module) {
+  function usage() {
+    console.log(`
 Usage: node cfr-refs.js <config.json> [-o output.html]
 
 Options:
   -o, --output <file>   Output HTML file (default: derived from config filename)
   -h, --help            Show this help
 `);
-  process.exit(0);
-}
-
-const args = process.argv.slice(2);
-if (!args.length || args.includes("-h") || args.includes("--help")) usage();
-
-let configPath = null;
-let outputPath = null;
-
-for (let i = 0; i < args.length; i++) {
-  if ((args[i] === "-o" || args[i] === "--output") && args[i + 1]) {
-    outputPath = args[++i];
-  } else if (!configPath) {
-    configPath = args[i];
+    process.exit(0);
   }
-}
 
-if (!configPath) { console.error("Error: config.json path required."); process.exit(1); }
+  const args = process.argv.slice(2);
+  if (!args.length || args.includes("-h") || args.includes("--help")) usage();
 
-// ── Load config ──────────────────────────────────────────────────────────────
+  configPath = null;
+  outputPath = null;
 
-let config;
-try {
-  config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-} catch (e) {
-  console.error(`Error reading config: ${e.message}`); process.exit(1);
-}
+  for (let i = 0; i < args.length; i++) {
+    if ((args[i] === "-o" || args[i] === "--output") && args[i + 1]) {
+      outputPath = args[++i];
+    } else if (!configPath) {
+      configPath = args[i];
+    }
+  }
 
-if (!config.title)       { console.error('Error: config missing "title".');       process.exit(1); }
-if (!config.borderColor) { console.error('Error: config missing "borderColor".'); process.exit(1); }
-if (!config.defined)     { console.error('Error: config missing "defined".');     process.exit(1); }
+  if (!configPath) { console.error("Error: config.json path required."); process.exit(1); }
 
-// ── Load Mermaid content (for Mermaid-based layouts) ────────────────────────
+  let cfg;
+  try {
+    cfg = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  } catch (e) {
+    console.error(`Error reading config: ${e.message}`); process.exit(1);
+  }
 
-const configDir = path.dirname(path.resolve(configPath));
-let mermaidContent = "";
-if (config.mermaid) {
-  mermaidContent = config.mermaid.trim();
-} else if (config.mermaidFile) {
-  const mmdPath = path.resolve(configDir, config.mermaidFile);
-  try { mermaidContent = fs.readFileSync(mmdPath, "utf-8").trim(); }
-  catch (e) { console.error(`Error reading mermaid file "${mmdPath}": ${e.message}`); process.exit(1); }
-}
+  try {
+    _initFromConfig(cfg, path.dirname(path.resolve(configPath)));
+  } catch (e) {
+    console.error("Error: " + e.message); process.exit(1);
+  }
 
-// Auto-detect Mermaid mode from first line of content
-let mermaidMode = null;
-if (mermaidContent) {
-  const fl = mermaidContent.split("\n")[0].trim().toLowerCase();
-  if (fl.startsWith("sequencediagram"))  mermaidMode = "sequence";
-  else if (fl.startsWith("statediagram")) mermaidMode = "state";
-  else if (fl.startsWith("gantt"))        mermaidMode = "gantt";
-  else                                    mermaidMode = "flowchart";
-}
-
-const layout = (config.layout || "events").toLowerCase();
-
-if (layout === "events") {
-  if (!Array.isArray(config.sections) || !config.sections.length) {
-    console.error('Error: vertical layout requires a non-empty "sections" array.'); process.exit(1);
+  if (!outputPath) {
+    const base = path.basename(configPath, path.extname(configPath));
+    outputPath = base + ".html";
   }
-} else if (layout === "timeline") {
-  if (!Array.isArray(config.periods) || !config.periods.length) {
-    console.error('Error: timeline layout requires a non-empty "periods" array.'); process.exit(1);
-  }
-} else if (layout === "lifecycle") {
-  if (!Array.isArray(config.lanes) || !config.lanes.length) {
-    console.error('Error: lifecycle layout requires a non-empty "lanes" array.'); process.exit(1);
-  }
-  if (!Array.isArray(config.stages) || !config.stages.length) {
-    console.error('Error: lifecycle layout requires a non-empty "stages" array.'); process.exit(1);
-  }
-} else if (layout === "lifecycle-t") {
-  if (!Array.isArray(config.lanes) || !config.lanes.length) {
-    console.error('Error: lifecycle-t layout requires a non-empty "lanes" array.'); process.exit(1);
-  }
-  if (!Array.isArray(config.stages) || !config.stages.length) {
-    console.error('Error: lifecycle-t layout requires a non-empty "stages" array.'); process.exit(1);
-  }
-} else if (layout === "flowchart" || layout === "sequence" || layout === "state" || layout === "gantt") {
-  if (!mermaidContent) {
-    console.error(`Error: layout "${layout}" requires "mermaid" or "mermaidFile" in config.`); process.exit(1);
-  }
-  // Per-mode required fields
-  if (layout === "flowchart" && !config.nodeMap) {
-    console.error('Error: flowchart layout requires "nodeMap" in config.'); process.exit(1);
-  }
-  if (layout === "sequence" && !config.phases) {
-    console.error('Error: sequence layout requires "phases" in config.'); process.exit(1);
-  }
-  if (layout === "state" && !config.stateMap) {
-    console.error('Error: state layout requires "stateMap" in config.'); process.exit(1);
-  }
-  if (layout === "gantt" && !config.taskMap) {
-    console.error('Error: gantt layout requires "taskMap" in config.'); process.exit(1);
-  }
-} else {
-  console.error(`Error: unknown layout "${layout}". Use "events", "timeline", "lifecycle", "lifecycle-t", "flowchart", "sequence", "state", or "gantt".`); process.exit(1);
-}
-
-if (!outputPath) {
-  const base = path.basename(configPath, path.extname(configPath));
-  outputPath = base + ".html";
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -473,9 +480,7 @@ function _markAcros(svgEl){
 
 // ── Shared constants ──────────────────────────────────────────────────────────
 
-const title       = config.title       || "CFR Regulatory Timeline";
-const subtitle    = config.subtitle    || "";
-const borderColor = config.borderColor || "#0e7490";
+let title, subtitle, borderColor;
 
 // ── Built-in regulatory acronyms (always available; user entries take precedence) ──
 const BUILTIN_ACRONYMS = {
@@ -493,7 +498,14 @@ const BUILTIN_ACRONYMS = {
   "USPS":  "United States Postal Service",
   "iOS":   "Apple mobile operating system",
 };
-const effectiveAcronyms = Object.assign({}, BUILTIN_ACRONYMS, config.acronyms || {});
+let effectiveAcronyms;
+
+function _initSharedConstants() {
+  title             = config.title       || "CFR Regulatory Timeline";
+  subtitle          = config.subtitle    || "";
+  borderColor       = config.borderColor || "#0e7490";
+  effectiveAcronyms = Object.assign({}, BUILTIN_ACRONYMS, config.acronyms || {});
+}
 
 // ── Shared tooltip CSS ────────────────────────────────────────────────────────
 
@@ -717,12 +729,7 @@ ${headerHtml}
 <script>${js}<\/script>
 </body></html>`;
 
-  fs.writeFileSync(outputPath, html, "utf-8");
-  console.log(`\u2713 Generated: ${outputPath}`);
-  console.log(`  Layout:    events`);
-  console.log(`  Sections:  ${config.sections.length}`);
-  console.log(`  Events:    ${totalEvents}`);
-  console.log(`  CFR refs:  ${allRefs.size}`);
+  return html;
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -1027,13 +1034,7 @@ ${headerHtml}
 <script>${js}<\/script>
 </body></html>`;
 
-  fs.writeFileSync(outputPath, html, "utf-8");
-  console.log(`\u2713 Generated: ${outputPath}`);
-  console.log(`  Layout:    timeline`);
-  console.log(`  Periods:   ${periods.length}`);
-  console.log(`  Markers:   ${markers.length}`);
-  console.log(`  Axis:      ${minYear} \u2013 ${maxYear}`);
-  console.log(`  CFR refs:  ${allRefs.size}`);
+  return html;
 }
 
 
@@ -2520,16 +2521,7 @@ ${fullSvg}
 <script>${js}<\/script>
 </body></html>`;
 
-  fs.writeFileSync(outputPath, html, "utf-8");
-  const cellCount = stages.reduce((n, st) => n + Object.keys(st.cells || {}).length, 0);
-  console.log("\u2713 Generated: " + outputPath);
-  console.log("  Layout:      lifecycle");
-  console.log("  Lanes:       " + lanes.length);
-  console.log("  Stages:      " + stages.length);
-  console.log("  Cells:       " + cellCount);
-  console.log("  Connections: " + connections.length);
-  console.log("  CFR refs:    " + allRefs.size);
-  console.log("  SVG size:    " + svgW + " x " + svgH + "px");
+  return html;
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -3431,16 +3423,7 @@ ${fullSvg}
 <script>${js}<\/script>
 </body></html>`;
 
-  fs.writeFileSync(outputPath, html, "utf-8");
-  const cellCount=stages.reduce((n,st)=>n+Object.keys(st.cells||{}).length,0);
-  console.log("\u2713 Generated: "+outputPath);
-  console.log("  Layout:      lifecycle-t");
-  console.log("  Lanes:       "+lanes.length);
-  console.log("  Stages:      "+stages.length);
-  console.log("  Cells:       "+cellCount);
-  console.log("  Connections: "+connections.length);
-  console.log("  CFR refs:    "+allRefs.size);
-  console.log("  SVG size:    "+svgW+" x "+svgH+"px");
+  return html;
 }
 
 // ── buildMermaid() — Mermaid-based layouts (flowchart/sequence/state/gantt) ──
@@ -3978,34 +3961,48 @@ ${scriptContent}
 <\/script>
 </body></html>`;
 
-  fs.writeFileSync(outputPath, html, "utf-8");
-
-  const itemCount = layout === "flowchart" ? Object.keys(config.nodeMap).length
-    : layout === "state" ? Object.keys(config.stateMap).length
-    : layout === "gantt" ? Object.keys(config.taskMap).length
-    : (config.phases || []).length;
-  const itemLabel = layout === "flowchart" ? "Nodes"
-    : layout === "state" ? "States"
-    : layout === "gantt" ? "Tasks"
-    : "Phases";
-
-  console.log("\u2713 Generated: " + outputPath);
-  console.log("  Layout:      " + layout);
-  console.log("  Title:       " + title);
-  console.log("  " + itemLabel + ":" + " ".repeat(10 - itemLabel.length) + itemCount);
-  console.log("  CFR refs:    " + Object.keys(config.defined).length);
+  return html;
 }
 
 // ── Dispatch ──────────────────────────────────────────────────────────────────
 
-if (layout === "events") {
-  buildEvents();
-} else if (layout === "timeline") {
-  buildTimeline();
-} else if (layout === "lifecycle-t") {
-  buildLifecycleT();
-} else if (layout === "lifecycle") {
-  buildLifecycle();
-} else {
-  buildMermaid();
+function _dispatch() {
+  _initSharedConstants();
+  if (layout === "events") {
+    return buildEvents();
+  } else if (layout === "timeline") {
+    return buildTimeline();
+  } else if (layout === "lifecycle-t") {
+    return buildLifecycleT();
+  } else if (layout === "lifecycle") {
+    return buildLifecycle();
+  } else {
+    return buildMermaid();
+  }
 }
+
+// ── CLI execution ─────────────────────────────────────────────────────────────
+
+if (require.main === module) {
+  const html = _dispatch();
+  fs.writeFileSync(outputPath, html, "utf-8");
+  console.log("\u2713 Generated: " + outputPath);
+  console.log("  Layout: " + layout);
+}
+
+// ── Library API ───────────────────────────────────────────────────────────────
+
+/**
+ * Generate an interactive HTML diagram from a JSON config object.
+ *
+ * @param {object} cfg        — The diagram config (same schema as the JSON file).
+ * @param {string} [cfgDir]   — Directory for resolving relative mermaidFile / logo
+ *                               paths.  Defaults to process.cwd().
+ * @returns {string}          — Self-contained HTML document.
+ */
+function generateDiagram(cfg, cfgDir) {
+  _initFromConfig(cfg, cfgDir || process.cwd());
+  return _dispatch();
+}
+
+module.exports = { generateDiagram };

@@ -578,19 +578,3 @@ A cell's stage must reflect what the actor is *doing in that step*, not what its
 - [ ] `section` names in `.mmd` match `phases[].name` if phase cards are used
 - [ ] `dateFormat YYYY-MM-DD` is present in `.mmd`
 
----
-
-## Examples
-
-All completed examples are available in the project outputs:
-
-| File | Layout | Program |
-|------|--------|---------|
-| `erate-lifecycle.json` + `.html` | `lifecycle` | E-Rate |
-| `erate-lifecycle-t.json` + `.html` | `lifecycle-t` | E-Rate |
-| `lifeline-lifecycle.html` | `lifecycle` | Lifeline |
-| `lifeline-lifecycle-t.html` | `lifecycle-t` | Lifeline |
-| `rhc-lifecycle.json` + `.html` | `lifecycle` | Rural Health Care |
-| `rhc-lifecycle-t.json` + `.html` | `lifecycle-t` | Rural Health Care |
-| `highcost-lifecycle.json` + `.html` | `lifecycle` | High Cost |
-| `highcost-lifecycle-t.json` + `.html` | `lifecycle-t` | High Cost |

@@ -14,7 +14,8 @@
     "install-mcp:claude-desktop": "node install-mcp.js --client=claude-desktop",
     "install-mcp:vscode": "node install-mcp.js --client=vscode",
     "install-mcp:cursor": "node install-mcp.js --client=cursor",
-    "install-mcp:windsurf": "node install-mcp.js --client=windsurf"
+    "install-mcp:windsurf": "node install-mcp.js --client=windsurf",
+    "install-skill": "node install-skill.js"
   },
   "keywords": [
     "mermaid",

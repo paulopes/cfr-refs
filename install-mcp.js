@@ -6,7 +6,6 @@
  *
  * Automates:
  *   1. Registers the MCP server in the target client's config
- *   2. (Claude Code only) Installs the cfr-refs skill
  *
  * Usage:
  *   npm run install-mcp                     # defaults to claude-code
@@ -24,7 +23,6 @@ const path = require("path");
 const os = require("os");
 
 const ROOT = __dirname;
-const SKILL_SRC = path.join(ROOT, "skill", "cfr-refs-SKILL.md");
 const MAIN_MJS = path.join(ROOT, "main.mjs");
 const SERVER_PATH = MAIN_MJS.replace(/\\/g, "/");
 
@@ -52,18 +50,12 @@ function appData() {
 //   configPath  — absolute path to the JSON config file
 //   serversKey  — top-level key in that JSON ("mcpServers" or "servers")
 //   scope       — "project" (relative to ROOT) or "global"
-//   skill       — optional: { dir, file } for skill installation
-
 const CLIENTS = {
   "claude-code": {
     label: "Claude Code",
     configPath: () => path.join(ROOT, ".mcp.json"),
     serversKey: "mcpServers",
     scope: "project",
-    skill: {
-      dir:  () => path.join(home(), ".claude", "skills", "cfr-refs"),
-      file: "SKILL.md",
-    },
   },
   "claude-desktop": {
     label: "Claude Desktop",
@@ -195,23 +187,6 @@ function registerServer(profile) {
   ok(`MCP config written → ${cfgPath}`);
 }
 
-// ── Install skill (Claude Code only) ────────────────────────────────────────
-
-function installSkill(profile) {
-  if (!profile.skill) return;
-
-  if (!fs.existsSync(SKILL_SRC)) {
-    warn("Skill source not found at " + SKILL_SRC + " — skipping");
-    return;
-  }
-
-  const dir = profile.skill.dir();
-  const dest = path.join(dir, profile.skill.file);
-  fs.mkdirSync(dir, { recursive: true });
-  fs.copyFileSync(SKILL_SRC, dest);
-  ok(`Skill installed → ${dest}`);
-}
-
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 const clientName = parseArgs();
@@ -222,7 +197,6 @@ console.log(`\n  cfr-refs MCP Installer  →  ${profile.label}\n`);
 try {
   checkPrerequisites();
   registerServer(profile);
-  installSkill(profile);
 
   console.log(`\n\x1b[32mDone!\x1b[0m cfr-refs is ready to use with ${profile.label}.\n`);
   console.log("  Stdio mode:  node " + SERVER_PATH + " --stdio");

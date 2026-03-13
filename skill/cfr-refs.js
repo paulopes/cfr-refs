@@ -212,12 +212,6 @@ function hexTint(hex, amount) {
 
 // ── Mermaid data-structure builders ─────────────────────────────────────────
 
-function buildDefined(defined) {
-  const entries = Object.entries(defined).map(([key, [title, desc]]) =>
-    `"${jsStr(key)}":["${jsStr(title)}","${jsStr(desc)}"]`);
-  return `{\n${entries.join(",\n")}\n}`;
-}
-
 function buildNodeMap(nodeMap) {
   const entries = Object.entries(nodeMap).map(([key, refs]) => {
     const arr = refs.map(r => `"${jsStr(r)}"`).join(",");
@@ -500,16 +494,17 @@ const BUILTIN_ACRONYMS = {
 };
 let effectiveAcronyms;
 
+let tooltipCss, tooltipJs, headerHtml;
+
 function _initSharedConstants() {
   title             = config.title       || "CFR Regulatory Timeline";
   subtitle          = config.subtitle    || "";
   borderColor       = config.borderColor || "#0e7490";
   effectiveAcronyms = Object.assign({}, BUILTIN_ACRONYMS, config.acronyms || {});
-}
 
 // ── Shared tooltip CSS ────────────────────────────────────────────────────────
 
-const tooltipCss = `
+tooltipCss = `
 #tt{display:none;position:fixed;z-index:9999;background:#0f172a;color:#e2e8f0;
   border-radius:10px;padding:14px 18px;max-width:500px;min-width:260px;
   font-size:.82rem;line-height:1.55;box-shadow:0 8px 30px rgba(0,0,0,.35);
@@ -539,7 +534,7 @@ a.cfr-link:hover{text-decoration:underline currentColor}`.trim();
 
 // ── Shared tooltip JS ─────────────────────────────────────────────────────────
 
-const tooltipJs = `
+tooltipJs = `
 var defined=${buildDefined(config.defined)};
 var _acroDict=${buildAcronymsJs(effectiveAcronyms)};
 var tip=document.getElementById('tt');
@@ -640,11 +635,13 @@ document.addEventListener('mousemove',function(e){
 
 // ── Shared page header HTML ───────────────────────────────────────────────────
 
-const headerHtml = `<h1>${transformHeader(title, esc, effectiveAcronyms)}</h1>
+headerHtml = `<h1>${transformHeader(title, esc, effectiveAcronyms)}</h1>
 ${subtitle ? `<p class="subtitle">${transformHeader(subtitle, esc, effectiveAcronyms)}</p>` : ""}
 <div class="instr-wrap"><div class="instr">${linkCfrInHtml('&#128161; Click any item to see the relevant regulatory text from Title 47 CFR &mdash; text is selectable for copying')}</div></div>
 <div id="acro-tip"></div>
 <div id="tt"><div class="th"></div><div class="tb"></div></div>`;
+
+} // end _initSharedConstants
 
 // ════════════════════════════════════════════════════════════════════════════
 // VERTICAL LAYOUT

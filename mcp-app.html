@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>CFR Refs Diagram</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #f8fafc; color: #1e293b;
+      }
+      #status {
+        padding: 24px; text-align: center; color: #64748b; font-size: 0.9rem;
+      }
+      #diagram-frame {
+        width: 100%; border: none; display: none;
+      }
+      #error {
+        display: none; padding: 16px 24px; color: #dc2626;
+        background: #fef2f2; border-left: 4px solid #dc2626;
+        font-size: 0.85rem; white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">Waiting for diagram data&hellip;</div>
+    <div id="error"></div>
+    <iframe id="diagram-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+    <script type="module" src="/src/mcp-app.js"></script>
+  </body>
+</html>

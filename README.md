@@ -69,6 +69,62 @@ Then in any Claude Code session, run `/cfr-refs` and describe the regulatory wor
 
 You can also use cfr-refs as a skill in a [Claude.ai](https://claude.ai) chat project (the online version, not Claude Code). See [INSTALL-ONLINE-PROJECT-SKILL.md](INSTALL-ONLINE-PROJECT-SKILL.md) for setup and usage instructions in that chat environment.
 
+## MCP Tool
+
+cfr-refs is also available as an [MCP](https://modelcontextprotocol.io/) server, exposing a `generate-diagram` tool that any MCP-compatible client can call.
+
+### Setup
+
+```bash
+git clone git@github.com:paulopes/cfr-refs.git && cd cfr-refs
+npm install
+npm run build
+```
+
+### Running
+
+**HTTP transport** (for Claude Desktop, web clients, etc.):
+```bash
+node main.mjs
+```
+The server listens on `http://localhost:3001/mcp` by default. Set the `PORT` environment variable to change the port.
+
+**stdio transport** (for VS Code, Claude Code, etc.):
+```bash
+node main.mjs --stdio
+```
+
+### MCP Client Configuration
+
+Add to your MCP client settings (e.g. Claude Desktop `claude_desktop_config.json` or VS Code `settings.json`):
+
+```json
+{
+  "mcpServers": {
+    "cfr-refs": {
+      "command": "node",
+      "args": ["<path-to-cfr-refs>/main.mjs", "--stdio"]
+    }
+  }
+}
+```
+
+The `generate-diagram` tool accepts a `config` parameter (the same JSON schema described in [cfr-refs-SKILL.md](skill/cfr-refs-SKILL.md)) and returns a self-contained HTML diagram.
+
+## MCP App
+
+When used with an [MCP Apps](https://apps.extensions.modelcontextprotocol.io/api/)-capable host (Claude, ChatGPT, VS Code, etc.), the generated diagram renders **inline in the conversation** as an interactive view — no need to open a separate file.
+
+The MCP App view is built automatically by `npm run build` and served as a `ui://` resource alongside the tool.
+
+### Development
+
+```bash
+npm start
+```
+
+This starts both the MCP server and a Vite watcher that rebuilds the App view on changes.
+
 ## License
 
 This project is licensed under the [Apache License 2.0](LICENSE) License.

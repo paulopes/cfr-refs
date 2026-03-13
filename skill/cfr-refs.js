@@ -1734,7 +1734,6 @@ function buildLifecycle() {
   }
 
   // Lane labels (left column)
-  const configDir = path.dirname(path.resolve(configPath));
   for (let li = 0; li < lanes.length; li++) {
     const lane   = lanes[li];
     const lBg    = lane.color      || "#f8fafc";
@@ -2761,7 +2760,6 @@ function buildLifecycleT() {
   }
 
   // Lane header boxes (top row)
-  const configDirT = path.dirname(path.resolve(configPath));
   for (let li = 0; li < lanes.length; li++) {
     const lane  = lanes[li];
     const lBg   = lane.color       || "#f8fafc";
@@ -2774,7 +2772,7 @@ function buildLifecycleT() {
     const labelTxtT     = isHighlightL ? lTxt : darkenHex(labelSrcT, 0.45);
     svg += `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${svgEsc(labelBoxFillT)}" stroke="${svgEsc(lBdr)}" stroke-width="1.5"/>`;
 
-    const logo = resolveLogoSrc(lane.logo, configDirT);
+    const logo = resolveLogoSrc(lane.logo, configDir);
     const LOGO_SZ = 60;
     if (logo) {
       // Logo left of text, vertically centred in header box.

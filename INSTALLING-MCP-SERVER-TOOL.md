@@ -117,7 +117,7 @@ Claude Code requires the server to be listed in `enabledMcpjsonServers` in `~/.c
 {
   "enabledMcpjsonServers": ["cfr-refs"],
   "env": {
-    "MAX_MCP_OUTPUT_TOKENS": "50000"
+    "MAX_MCP_OUTPUT_TOKENS": "75000"
   }
 }
 ```

@@ -191,7 +191,7 @@ function registerServer(profile) {
 
 function enableInClaudeSettings() {
   const settingsPath = path.join(home(), ".claude", "settings.json");
-  const MIN_MCP_TOKENS = 50000;
+  const MIN_MCP_TOKENS = 75000;
 
   let settings = {};
   if (fs.existsSync(settingsPath)) {

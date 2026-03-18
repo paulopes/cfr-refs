@@ -135,4 +135,4 @@ This starts both the MCP server and a Vite watcher that rebuilds the App view on
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE) License.
+This project is licensed under the [Apache License 2.0](LICENSE).

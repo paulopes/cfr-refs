@@ -4,7 +4,7 @@ An MCP server that exposes cfr-refs as a tool with an interactive UI. When calle
 
 ## What It Does
 
-You ask Claude to create a regulatory diagram, and it calls the `generate-diagram` tool on your local MCP server. The tool returns a self-contained HTML diagram, and the MCP App view renders it directly in the chat — no need to open a separate file.
+You ask Claude to create a regulatory diagram, and it calls the `generate-crf-refs-diagram` tool on your local MCP server. The tool returns a self-contained HTML diagram, and the MCP App view renders it directly in the chat — no need to open a separate file.
 
 All eight layout types are supported: `events`, `timeline`, `lifecycle`, `lifecycle-t`, `flowchart`, `sequence`, `state`, and `gantt`.
 
@@ -134,7 +134,7 @@ In a Claude Code session, ask:
 
 > "What tools do you have?"
 
-You should see `generate-diagram` in the list. If you also have the cfr-refs skill installed, Claude will know when and how to use it automatically.
+You should see `generate-crf-refs-diagram` in the list. If you also have the cfr-refs skill installed, Claude will know when and how to use it automatically.
 
 ## Usage
 
@@ -146,7 +146,7 @@ Claude will:
 
 1. Research the relevant CFR sections
 2. Build the JSON config following the cfr-refs schema
-3. Call the `generate-diagram` MCP tool with the config
+3. Call the `generate-crf-refs-diagram` MCP tool with the config
 4. The diagram renders inline — click any node to see the CFR text
 
 You can also provide a config object directly:
@@ -159,7 +159,7 @@ The MCP server registers two things:
 
 | Component | URI / Name | Purpose |
 |-----------|-----------|---------|
-| **Tool** | `generate-diagram` | Accepts a cfr-refs JSON config, returns self-contained HTML |
+| **Tool** | `generate-crf-refs-diagram` | Accepts a cfr-refs JSON config, returns self-contained HTML |
 | **UI Resource** | `ui://cfr-refs/mcp-app.html` | Bundled MCP App view that renders the HTML in an iframe |
 
 When an MCP Apps-capable host (Claude Code, Claude Desktop, ChatGPT, VS Code) calls the tool, it also reads the `_meta.ui.resourceUri` to fetch the view. The view receives the tool result and renders the diagram inline in the conversation, inside a sandboxed iframe.

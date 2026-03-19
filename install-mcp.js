@@ -251,7 +251,7 @@ try {
   console.log(`\n\x1b[32mDone!\x1b[0m cfr-refs is ready to use with ${profile.label}.\n`);
   console.log("  Stdio mode:  node " + SERVER_PATH + " --stdio");
   console.log("  HTTP mode:   node " + SERVER_PATH + "  (port 3001)");
-  console.log("\n  The 'generate-diagram' tool is now available.");
+  console.log("\n  The 'generate-crf-refs-diagram' tool is now available.");
   if (clientName === "claude-code") {
     console.log("  \x1b[33mIMPORTANT:\x1b[0m Fully quit Claude Code (don't just close the window) and relaunch it.");
   }

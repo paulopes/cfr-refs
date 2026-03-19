@@ -72,7 +72,7 @@ You can also use cfr-refs as a skill in a [Claude.ai](https://claude.ai) chat pr
 
 ## MCP Tool
 
-cfr-refs is also available as an [MCP](https://modelcontextprotocol.io/) server, exposing a `generate-diagram` tool that any MCP-compatible client can call.
+cfr-refs is also available as an [MCP](https://modelcontextprotocol.io/) server, exposing a `generate-crf-refs-diagram` tool that any MCP-compatible client can call.
 
 You may be asking: Why would you want to use the MCP tool in Claude Code instead of the skill? The reason is that the MCP tools is also an MCP app, which means that the result will be rendered in line with the chat.
 
@@ -99,7 +99,7 @@ node main.mjs --stdio
 
 ### Connecting from web apps on the same machine
 
-When the server is running in HTTP mode, any web application on the same machine can connect to it at `http://localhost:3001/mcp` using the Streamable HTTP transport. CORS is enabled, so browser-based apps can call the `generate-diagram` tool directly.
+When the server is running in HTTP mode, any web application on the same machine can connect to it at `http://localhost:3001/mcp` using the Streamable HTTP transport. CORS is enabled, so browser-based apps can call the `generate-crf-refs-diagram` tool directly.
 
 > **Note:** Cloud-hosted AI clients (e.g. Claude.ai, ChatGPT) make MCP connections from their own servers, not from your browser — so `localhost` won't work for those. You would need to expose the server via a tunnel (e.g. ngrok) or deploy it to a public host. In that case, consider adding authentication before exposing the server to the internet.
 
@@ -117,7 +117,7 @@ npm run install-mcp:windsurf
 
 See [INSTALLING-MCP-SERVER-TOOL.md](INSTALLING-MCP-SERVER-TOOL.md) for full details, manual setup steps, config file locations, and instructions for other clients (including Goose).
 
-The `generate-diagram` tool accepts a `config` parameter (the same JSON schema described in [cfr-refs-SKILL.md](skill/cfr-refs-SKILL.md)) and returns a self-contained HTML diagram.
+The `generate-crf-refs-diagram` tool accepts a `config` parameter (the same JSON schema described in [cfr-refs-SKILL.md](skill/cfr-refs-SKILL.md)) and returns a self-contained HTML diagram.
 
 ## MCP App
 

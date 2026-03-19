@@ -210,4 +210,4 @@ This runs both `vite build --watch` (rebuilds the view on changes) and the MCP s
 
 VS Code imposes a hard byte limit on MCP tool output that **cannot be configured** by the user. Complex diagrams with many CFR sections and lengthy quoted text may be truncated. The library API automatically minifies the HTML output to reduce byte count, but very large diagrams may still exceed the limit. If you encounter truncation in VS Code, consider reducing the number of `defined` entries or shortening the quoted text.
 
-Claude Code has a similar limit (`MAX_MCP_OUTPUT_TOKENS`, default 25 000 tokens) but it **can** be increased — the automated installer sets it to 50 000 in `~/.claude/settings.json`.
+Claude Code has a similar limit (`MAX_MCP_OUTPUT_TOKENS`, default 25 000 tokens) but it **can** be increased — the automated installer sets it to 75 000 in `~/.claude/settings.json`.

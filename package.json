@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "description": "Generate styled HTML lifecycle diagrams and Mermaid diagrams using data in JSON configs. Usable as CLI, MCP tool, or MCP App.",
   "bin": {
-    "cfr-refs": "./skill/cfr-refs.js"
+    "mcp-cfr-refs": "./install-mcp.js"
   },
   "scripts": {
     "build": "cross-env INPUT=mcp-app.html vite build",
@@ -15,6 +15,7 @@
     "install-mcp:vscode": "node install-mcp.js --client=vscode",
     "install-mcp:cursor": "node install-mcp.js --client=cursor",
     "install-mcp:windsurf": "node install-mcp.js --client=windsurf",
+    "install-mcp:antigravity": "node install-mcp.js --client=antigravity",
     "install-skill": "node install-skill.js"
   },
   "keywords": [

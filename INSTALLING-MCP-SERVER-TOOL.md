@@ -4,7 +4,7 @@ An MCP server that exposes cfr-refs as a tool with an interactive UI. When calle
 
 ## What It Does
 
-You ask Claude to create a regulatory diagram, and it calls the `generate-crf-refs-diagram` tool on your local MCP server. The tool returns a self-contained HTML diagram, and the MCP App view renders it directly in the chat — no need to open a separate file.
+You ask Claude to create a regulatory diagram, and it calls the `generate-cfr-refs-diagram` tool on your local MCP server. The tool returns a self-contained HTML diagram, and the MCP App view renders it directly in the chat — no need to open a separate file.
 
 All eight layout types are supported: `events`, `timeline`, `lifecycle`, `lifecycle-t`, `flowchart`, `sequence`, `state`, and `gantt`.
 
@@ -19,16 +19,25 @@ npm run build
 npm run install-mcp
 ```
 
-This defaults to **Claude Code**. To install for a different client:
+This defaults to writing `.mcp.json` in the current local directory, typically a project's root directory, which works with Gemini CLI and with other local MCP clients such as Claude Code on a per project basis.
+
+To install globally for Claude Code in the terminal or inside Claude Desktop:
+
+```bash
+npm run install-mcp:claude-code
+npm run install-mcp:claude-desktop
+```
+
+To install for a specific IDE:
 
 ```bash
 npm run install-mcp:vscode
-npm run install-mcp:claude-desktop
 npm run install-mcp:cursor
 npm run install-mcp:windsurf
+npm run install-mcp:antigravity
 ```
 
-Run `npm run install-mcp -- --list` to see all supported clients and their config file locations.
+Run `npm run install-mcp -- --list` or `install-cfr-refs-mcp --list` to see all supported clients and their config file locations.
 
 The installer verifies that `npm install` and `npm run build` have already been run, and registers the MCP server in the target client's config.
 
@@ -50,13 +59,15 @@ Add the server entry to your client's MCP configuration file:
 
 | Client | Config file | Servers key |
 |--------|------------|-------------|
-| Claude Code | `~/.claude/.mcp.json` (global) | `mcpServers` |
+| Claude Code (global)| `~/.claude/.mcp.json` (macOS) or `%USERPROFILE%\.claude\.mcp.json` (Windows) | `mcpServers` |
 | Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows) | `mcpServers` |
-| VS Code (Copilot) | `.vscode/mcp.json` (project root) | `servers` |
-| Cursor | `~/.cursor/mcp.json` | `mcpServers` |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` | `mcpServers` |
+| Claude Code (local) or Gemini CLI | `.mcp.json` (project root) | `mcpServers` |
+| VS Code (Github Copilot) | `.vscode/mcp.json` (project root) | `servers` |
+| Cursor | `~/.cursor/mcp.json` (macOS) or `%USERPROFILE%\.cursor\mcp.json` (Windows)  | `mcpServers` |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` (macOS) or `%USERPROFILE%\.codeium\windsurf\mcp_config.json` (Windows)  | `mcpServers` |
+| Antigravity | `~/.gemini/antigravity/mcp_config.json` (macOS) or `%USERPROFILE%\.gemini\antigravity\mcp_config.json` (Windows) | `mcpServers` |
 
-**Example (Claude Code / Claude Desktop / Cursor / Windsurf):**
+**Example (Gemini CLI / Claude Code / Claude Desktop / Cursor / Windsurf / Antigravity):**
 ```json
 {
   "mcpServers": {
@@ -134,7 +145,7 @@ In a Claude Code session, ask:
 
 > "What tools do you have?"
 
-You should see `generate-crf-refs-diagram` in the list. If you also have the cfr-refs skill installed, Claude will know when and how to use it automatically.
+You should see `generate-cfr-refs-diagram` in the list. If you also have the cfr-refs skill installed, Claude will know when and how to use it automatically.
 
 ## Usage
 
@@ -146,7 +157,7 @@ Claude will:
 
 1. Research the relevant CFR sections
 2. Build the JSON config following the cfr-refs schema
-3. Call the `generate-crf-refs-diagram` MCP tool with the config
+3. Call the `generate-cfr-refs-diagram` MCP tool with the config
 4. The diagram renders inline — click any node to see the CFR text
 
 You can also provide a config object directly:
@@ -159,7 +170,7 @@ The MCP server registers two things:
 
 | Component | URI / Name | Purpose |
 |-----------|-----------|---------|
-| **Tool** | `generate-crf-refs-diagram` | Accepts a cfr-refs JSON config, returns self-contained HTML |
+| **Tool** | `generate-cfr-refs-diagram` | Accepts a cfr-refs JSON config, returns self-contained HTML |
 | **UI Resource** | `ui://cfr-refs/mcp-app.html` | Bundled MCP App view that renders the HTML in an iframe |
 
 When an MCP Apps-capable host (Claude Code, Claude Desktop, ChatGPT, VS Code) calls the tool, it also reads the `_meta.ui.resourceUri` to fetch the view. The view receives the tool result and renders the diagram inline in the conversation, inside a sandboxed iframe.
@@ -201,7 +212,7 @@ This runs both `vite build --watch` (rebuilds the view on changes) and the MCP s
 ## Requirements
 
 - Node.js 18+
-- An MCP-compatible client (Claude Code, Claude Desktop, VS Code, ChatGPT, etc.)
+- An MCP-compatible client (Gemini CLI, Claude Code, Claude Desktop, VS Code, ChatGPT, etc.)
 - `npm install` and `npm run build` must be run before first use
 
 ## Known Limitations

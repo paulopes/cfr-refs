@@ -32,7 +32,7 @@ export function createServer() {
   const resourceUri = "ui://cfr-refs/mcp-app.html";
   const skillGuideUri = "docs://cfr-refs/skill-guide";
 
-  // ── Tool: generate-crf-refs-diagram ──────────────────────────────────────────────
+  // ── Tool: generate-cfr-refs-diagram ──────────────────────────────────────────────
   //
   // Accepts a full cfr-refs JSON config object and returns the generated
   // self-contained HTML diagram.  When called from an MCP Apps-capable host
@@ -40,7 +40,7 @@ export function createServer() {
 
   registerAppTool(
     server,
-    "generate-crf-refs-diagram",
+    "generate-cfr-refs-diagram",
     {
       title: "Generate CFR Diagram",
       description:
@@ -97,7 +97,7 @@ export function createServer() {
   //
   // Exposes the cfr-refs SKILL.md as a readable MCP resource so that AI
   // clients can fetch full layout schemas, examples, and quality checklists
-  // before calling generate-crf-refs-diagram.
+  // before calling generate-cfr-refs-diagram.
 
   server.resource(
     "skill-guide",
@@ -108,7 +108,7 @@ export function createServer() {
         "Complete documentation for the cfr-refs diagram generator: " +
         "JSON schemas for all 8 layouts, field references, canonical " +
         "program colors, quality checklists, and worked examples. " +
-        "Read this before calling generate-crf-refs-diagram.",
+        "Read this before calling generate-cfr-refs-diagram.",
       mimeType: "text/markdown",
     },
     async (uri) => {

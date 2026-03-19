@@ -51,6 +51,12 @@ function appData() {
 //   serversKey  — top-level key in that JSON ("mcpServers" or "servers")
 //   scope       — "project" (relative to ROOT) or "global"
 const CLIENTS = {
+  "local": {
+    label: "Local (.mcp.json in project root)",
+    configPath: () => path.join(ROOT, ".mcp.json"),
+    serversKey: "mcpServers",
+    scope: "project",
+  },
   "claude-code": {
     label: "Claude Code",
     configPath: () => path.join(home(), ".claude", ".mcp.json"),
@@ -81,13 +87,19 @@ const CLIENTS = {
     serversKey: "mcpServers",
     scope: "global",
   },
+  "antigravity": {
+    label: "Google Antigravity",
+    configPath: () => path.join(home(), ".gemini", "antigravity", "mcp_config.json"),
+    serversKey: "mcpServers",
+    scope: "global",
+  },
 };
 
 // ── Arg parsing ──────────────────────────────────────────────────────────────
 
 function parseArgs() {
   const args = process.argv.slice(2);
-  let clientName = "claude-code"; // default
+  let clientName = "local"; // default
 
   for (const arg of args) {
     if (arg === "--help" || arg === "-h") { printUsage(); process.exit(0); }
@@ -110,13 +122,13 @@ function printUsage() {
   Prerequisites: npm install && npm run build
 
   Options:
-    --client=NAME   Target client (default: claude-code)
+    --client=NAME   Target client (default: local)
     --list, -l      List supported clients
     --help, -h      Show this help
 
   Examples:
     npm run install-mcp
-    npm run install-mcp -- --client=vscode
+    npm run install-mcp -- --client=claude-code
     node install-mcp.js --client=claude-desktop
 `);
 }
@@ -124,7 +136,7 @@ function printUsage() {
 function printClients() {
   console.log("\n  Supported clients:\n");
   for (const [key, c] of Object.entries(CLIENTS)) {
-    const def = key === "claude-code" ? " (default)" : "";
+    const def = key === "local" ? " (default)" : "";
     console.log(`    ${key.padEnd(18)} ${c.label}${def}`);
     console.log(`${"".padEnd(22)} config: ${c.configPath()}  [${c.scope}]`);
   }
@@ -251,7 +263,7 @@ try {
   console.log(`\n\x1b[32mDone!\x1b[0m cfr-refs is ready to use with ${profile.label}.\n`);
   console.log("  Stdio mode:  node " + SERVER_PATH + " --stdio");
   console.log("  HTTP mode:   node " + SERVER_PATH + "  (port 3001)");
-  console.log("\n  The 'generate-crf-refs-diagram' tool is now available.");
+  console.log("\n  The 'generate-cfr-refs-diagram' tool is now available.");
   if (clientName === "claude-code") {
     console.log("  \x1b[33mIMPORTANT:\x1b[0m Fully quit Claude Code (don't just close the window) and relaunch it.");
   }

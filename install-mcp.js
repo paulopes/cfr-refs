@@ -52,8 +52,8 @@ function appData() {
 //   scope       — "project" (relative to ROOT) or "global"
 const CLIENTS = {
   "local": {
-    label: "Local (.mcp.json in project root)",
-    configPath: () => path.join(ROOT, ".mcp.json"),
+    label: "Local (.mcp.json in current directory)",
+    configPath: () => path.join(process.cwd(), ".mcp.json"),
     serversKey: "mcpServers",
     scope: "project",
   },

@@ -12,7 +12,7 @@ npm install
 npm link
 ```
 
-This makes `cfr-refs` available as a global command.
+This makes `cfr-refs` and `mcp-cfr-refs` available as global commands.
 
 ## Usage
 
@@ -61,7 +61,9 @@ mkdir -Force "$env:USERPROFILE\.claude\skills\cfr-refs"
 copy skill\cfr-refs-SKILL.md "$env:USERPROFILE\.claude\skills\cfr-refs\SKILL.md"
 ```
 
-> **Note:** You don't need to copy the cfr-refs.js file because after typing `npm link` you made `cfr-refs` a globally available command in your machine.
+> **Note:** You don't need to copy the cfr-refs.js file because after typing `npm link` you made two globaly available commands:
+- `cfr-refs` to run the generator script from any directory;
+- `mcp-cfr-refs` to create a local project .mcp.json file for generic MCP clients or optionally to add this tool as an MCP server to popular MCP clients.
 
 Then in any Claude Code session, run `/cfr-refs` and describe the regulatory workflow you want to diagram.
 

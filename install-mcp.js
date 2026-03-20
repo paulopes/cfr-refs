@@ -93,6 +93,18 @@ const CLIENTS = {
     serversKey: "mcpServers",
     scope: "global",
   },
+  "gemini-cli": {
+    label: "Gemini CLI (project)",
+    configPath: () => path.join(process.cwd(), ".gemini", "settings.json"),
+    serversKey: "mcpServers",
+    scope: "project",
+  },
+  "gemini-cli-global": {
+    label: "Gemini CLI (global)",
+    configPath: () => path.join(home(), ".gemini", "settings.json"),
+    serversKey: "mcpServers",
+    scope: "global",
+  },
 };
 
 // ── Arg parsing ──────────────────────────────────────────────────────────────
@@ -245,6 +257,34 @@ function enableInClaudeSettings() {
   }
 }
 
+// ── Enable server in Gemini CLI settings ─────────────────────────────────────
+
+function enableInGeminiSettings(profile) {
+  const cfgPath = profile.configPath();
+
+  let settings = {};
+  if (fs.existsSync(cfgPath)) {
+    try {
+      settings = JSON.parse(fs.readFileSync(cfgPath, "utf-8"));
+    } catch {
+      warn("settings.json exists but is invalid JSON — skipping mcp.allowed update");
+      return;
+    }
+  }
+
+  if (!settings.mcp) settings.mcp = {};
+  const allowed = settings.mcp.allowed || [];
+  if (allowed.includes("cfr-refs")) {
+    ok("mcp.allowed already includes cfr-refs");
+    return;
+  }
+
+  allowed.push("cfr-refs");
+  settings.mcp.allowed = allowed;
+  fs.writeFileSync(cfgPath, JSON.stringify(settings, null, 2) + "\n", "utf-8");
+  ok(`mcp.allowed updated → ${cfgPath}`);
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 const clientName = parseArgs();
@@ -258,6 +298,10 @@ try {
 
   if (clientName === "claude-code") {
     enableInClaudeSettings();
+  }
+
+  if (clientName === "gemini-cli" || clientName === "gemini-cli-global") {
+    enableInGeminiSettings(profile);
   }
 
   console.log(`\n\x1b[32mDone!\x1b[0m cfr-refs is ready to use with ${profile.label}.\n`);

@@ -117,6 +117,8 @@ npm run install-mcp:vscode
 npm run install-mcp:cursor
 npm run install-mcp:windsurf
 npm run install-mcp:antigravity
+npm run install-mcp:gemini-cli
+npm run install-mcp:gemini-cli-global
 ```
 
 See [INSTALLING-MCP-SERVER-TOOL.md](INSTALLING-MCP-SERVER-TOOL.md) for full details, manual setup steps, config file locations, and instructions for other clients (including Goose).

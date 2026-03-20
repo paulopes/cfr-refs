@@ -37,6 +37,15 @@ npm run install-mcp:windsurf
 npm run install-mcp:antigravity
 ```
 
+To install for Gemini CLI (project-level or global):
+
+```bash
+npm run install-mcp:gemini-cli
+npm run install-mcp:gemini-cli-global
+```
+
+The Gemini CLI installers also add `cfr-refs` to the `mcp.allowed` list in the corresponding `settings.json`.
+
 Run `npm run install-mcp -- --list` or `install-cfr-refs-mcp --list` to see all supported clients and their config file locations.
 
 The installer verifies that `npm install` and `npm run build` have already been run, and registers the MCP server in the target client's config.
@@ -61,11 +70,13 @@ Add the server entry to your client's MCP configuration file:
 |--------|------------|-------------|
 | Claude Code (global)| `~/.claude/.mcp.json` (macOS) or `%USERPROFILE%\.claude\.mcp.json` (Windows) | `mcpServers` |
 | Claude Desktop | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows) | `mcpServers` |
-| Claude Code (local) or Gemini CLI | `.mcp.json` (project root) | `mcpServers` |
+| Claude Code (local) | `.mcp.json` (project root) | `mcpServers` |
 | VS Code (Github Copilot) | `.vscode/mcp.json` (project root) | `servers` |
 | Cursor | `~/.cursor/mcp.json` (macOS) or `%USERPROFILE%\.cursor\mcp.json` (Windows)  | `mcpServers` |
 | Windsurf | `~/.codeium/windsurf/mcp_config.json` (macOS) or `%USERPROFILE%\.codeium\windsurf\mcp_config.json` (Windows)  | `mcpServers` |
 | Antigravity | `~/.gemini/antigravity/mcp_config.json` (macOS) or `%USERPROFILE%\.gemini\antigravity\mcp_config.json` (Windows) | `mcpServers` |
+| Gemini CLI (project) | `.gemini/settings.json` (project root) | `mcpServers` |
+| Gemini CLI (global) | `~/.gemini/settings.json` (macOS) or `%USERPROFILE%\.gemini\settings.json` (Windows) | `mcpServers` |
 
 **Example (Gemini CLI / Claude Code / Claude Desktop / Cursor / Windsurf / Antigravity):**
 ```json

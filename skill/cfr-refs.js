@@ -138,37 +138,16 @@ if (require.main === module) {
   function usage() {
     console.log(`
 Usage: cfr-refs <config.json> [-o output.html]
-       cfr-refs --mcp
 
 Options:
   -o, --output <file>   Output HTML file (default: derived from config filename)
-  -m, --mcp             Write a .mcp.json in the current directory to register
-                        cfr-refs as an MCP server for this project
   -h, --help            Show this help
 `);
     process.exit(0);
   }
 
-  function writeMcpJson() {
-    const mcpPath = path.join(process.cwd(), ".mcp.json");
-    let existing = {};
-    if (fs.existsSync(mcpPath)) {
-      try { existing = JSON.parse(fs.readFileSync(mcpPath, "utf-8")); } catch {}
-    }
-    if (!existing.mcpServers) existing.mcpServers = {};
-    const mainMjs = path.resolve(__dirname, "..", "main.mjs");
-    existing.mcpServers["cfr-refs"] = {
-      command: "node",
-      args: [mainMjs, "--stdio"],
-    };
-    fs.writeFileSync(mcpPath, JSON.stringify(existing, null, 2) + "\n", "utf-8");
-    console.log(`\u2713 MCP config written \u2192 ${mcpPath}`);
-    process.exit(0);
-  }
-
   const args = process.argv.slice(2);
   if (!args.length || args.includes("-h") || args.includes("--help")) usage();
-  if (args.includes("-m") || args.includes("--mcp")) writeMcpJson();
 
   configPath = null;
   outputPath = null;

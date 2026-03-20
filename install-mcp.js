@@ -71,7 +71,7 @@ const CLIENTS = {
   },
   "vscode": {
     label: "VS Code (GitHub Copilot)",
-    configPath: () => path.join(ROOT, ".vscode", "mcp.json"),
+    configPath: () => path.join(process.cwd(), ".vscode", "mcp.json"),
     serversKey: "servers",
     scope: "project",
   },

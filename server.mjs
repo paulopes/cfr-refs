@@ -46,9 +46,9 @@ export function createServer() {
       description:
         "Generate an interactive HTML regulatory diagram from a cfr-refs JSON config. " +
         "Returns a self-contained HTML document with clickable CFR reference tooltips.\n\n" +
-        "IMPORTANT: Before calling this tool, read the skill guide resource at " +
-        "docs://cfr-refs/skill-guide for full JSON schema details, layout selection " +
-        "guidance, quality checklists, and examples.\n\n" +
+        "IMPORTANT: Before calling this tool, call read-cfr-refs-skill-guide (or read " +
+        "the resource docs://cfr-refs/skill-guide) for full JSON schema details, " +
+        "layout selection guidance, quality checklists, and examples.\n\n" +
         "Layouts (set via \"layout\" field):\n" +
         "- events: Vertical spine with era sections and clickable event dots (needs \"sections\")\n" +
         "- timeline: Gantt-style bars on a shared year axis (needs \"periods\")\n" +
@@ -90,6 +90,24 @@ export function createServer() {
           isError: true,
         };
       }
+    }
+  );
+
+  // ── Tool: read-skill-guide ──────────────────────────────────────────────
+  //
+  // Returns the full cfr-refs SKILL.md as text so that clients which don't
+  // support MCP resources can still fetch the schema documentation.
+
+  server.tool(
+    "read-cfr-refs-skill-guide",
+    "Return the full cfr-refs skill guide (JSON schemas for all 8 layouts, " +
+      "field references, canonical program colors, quality checklists, and " +
+      "worked examples). Call this before generate-cfr-refs-diagram to learn " +
+      "how to structure the config object.",
+    {},
+    async () => {
+      const text = await fs.readFile(SKILL_PATH, "utf-8");
+      return { content: [{ type: "text", text }] };
     }
   );
 

@@ -117,6 +117,7 @@ npm run install-mcp:vscode
 npm run install-mcp:cursor
 npm run install-mcp:windsurf
 npm run install-mcp:antigravity
+npm run install-mcp:antigravity-global
 npm run install-mcp:gemini-cli
 npm run install-mcp:gemini-cli-global
 ```

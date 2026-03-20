@@ -35,6 +35,7 @@ npm run install-mcp:vscode
 npm run install-mcp:cursor
 npm run install-mcp:windsurf
 npm run install-mcp:antigravity
+npm run install-mcp:antigravity-global
 ```
 
 To install for Gemini CLI (project-level or global):
@@ -74,14 +75,27 @@ Add the server entry to your client's MCP configuration file:
 | VS Code (Github Copilot) | `.vscode/mcp.json` (project root) | `servers` |
 | Cursor | `~/.cursor/mcp.json` (macOS) or `%USERPROFILE%\.cursor\mcp.json` (Windows)  | `mcpServers` |
 | Windsurf | `~/.codeium/windsurf/mcp_config.json` (macOS) or `%USERPROFILE%\.codeium\windsurf\mcp_config.json` (Windows)  | `mcpServers` |
-| Antigravity | `~/.gemini/antigravity/mcp_config.json` (macOS) or `%USERPROFILE%\.gemini\antigravity\mcp_config.json` (Windows) | `mcpServers` |
+| Antigravity (project) | `.vscode/settings.json` (project root) | `gemini.codeAssist.mcpServers` |
+| Antigravity (global) | `~/.gemini/antigravity/mcp_config.json` (macOS) or `%USERPROFILE%\.gemini\antigravity\mcp_config.json` (Windows) | `mcpServers` |
 | Gemini CLI (project) | `.gemini/settings.json` (project root) | `mcpServers` |
 | Gemini CLI (global) | `~/.gemini/settings.json` (macOS) or `%USERPROFILE%\.gemini\settings.json` (Windows) | `mcpServers` |
 
-**Example (Gemini CLI / Claude Code / Claude Desktop / Cursor / Windsurf / Antigravity):**
+**Example (Gemini CLI / Claude Code / Claude Desktop / Cursor / Windsurf / Antigravity global):**
 ```json
 {
   "mcpServers": {
+    "cfr-refs": {
+      "command": "node",
+      "args": ["/absolute/path/to/cfr-refs/main.mjs", "--stdio"]
+    }
+  }
+}
+```
+
+**Example (Antigravity project — `.vscode/settings.json`):**
+```json
+{
+  "gemini.codeAssist.mcpServers": {
     "cfr-refs": {
       "command": "node",
       "args": ["/absolute/path/to/cfr-refs/main.mjs", "--stdio"]

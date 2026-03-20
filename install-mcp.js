@@ -88,7 +88,13 @@ const CLIENTS = {
     scope: "global",
   },
   "antigravity": {
-    label: "Google Antigravity",
+    label: "Google Antigravity (project)",
+    configPath: () => path.join(process.cwd(), ".vscode", "settings.json"),
+    serversKey: "gemini.codeAssist.mcpServers",
+    scope: "project",
+  },
+  "antigravity-global": {
+    label: "Google Antigravity (global)",
     configPath: () => path.join(home(), ".gemini", "antigravity", "mcp_config.json"),
     serversKey: "mcpServers",
     scope: "global",

@@ -17,6 +17,7 @@
     "install-mcp:cursor": "node install-mcp.js --client=cursor",
     "install-mcp:windsurf": "node install-mcp.js --client=windsurf",
     "install-mcp:antigravity": "node install-mcp.js --client=antigravity",
+    "install-mcp:antigravity-global": "node install-mcp.js --client=antigravity-global",
     "install-mcp:gemini-cli": "node install-mcp.js --client=gemini-cli",
     "install-mcp:gemini-cli-global": "node install-mcp.js --client=gemini-cli-global",
     "install-skill": "node install-skill.js"
